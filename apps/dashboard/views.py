@@ -38,9 +38,16 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             top["evaluation_supplier__snapshot_name"] if top else "—"
         )
 
-        ctx["status_chart"] = list(
-            evaluations.values("status").annotate(total=Count("id")).order_by("status")
-        )
+        status_labels = dict(Evaluation.Status.choices)
+        ctx["status_chart"] = [
+            {
+                "status": status_labels.get(item["status"], item["status"]),
+                "total": item["total"],
+            }
+            for item in evaluations.values("status")
+            .annotate(total=Count("id"))
+            .order_by("status")
+        ]
         ctx["service_chart"] = list(
             evaluations.values("service__name")
             .annotate(total=Count("id"))
