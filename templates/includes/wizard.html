@@ -1,0 +1,12 @@
+{% if steps %}
+<div class="panel p-3 mb-4">
+  <div class="d-flex justify-content-between flex-wrap gap-2">
+    {% for num, label in steps %}
+      <div class="wizard-step {% if current_step == num %}active{% elif current_step > num %}done{% endif %}">
+        <div class="dot">{% if current_step > num %}<i class="fa-solid fa-check"></i>{% else %}{{ num }}{% endif %}</div>
+        <span>{{ label }}</span>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}

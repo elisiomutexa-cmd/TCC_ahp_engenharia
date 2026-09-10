@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block page_title %}Propostas e anexos{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div><h2 class="h5 mb-1">{{ evaluation.service.name }}</h2><p class="text-muted mb-0">Documentos submetidos pelos fornecedores desta avaliação.</p></div>
+  <a class="btn btn-outline-secondary" href="{% url 'evaluations:detail' evaluation.pk %}">Voltar à avaliação</a>
+</div>
+{% if evaluation.is_editable %}
+<div class="card panel p-4 mb-4">
+  <h3 class="h6">Anexar proposta</h3>
+  <form method="post" enctype="multipart/form-data" class="row g-3">
+    {% csrf_token %}
+    <div class="col-md-4">{{ form.evaluation_supplier.label_tag }}{{ form.evaluation_supplier }}{{ form.evaluation_supplier.errors }}</div>
+    <div class="col-md-4">{{ form.file.label_tag }}{{ form.file }}<small class="text-muted">PDF, Word, Excel ou imagem.</small>{{ form.file.errors }}</div>
+    <div class="col-md-4">{{ form.description.label_tag }}{{ form.description }}{{ form.description.errors }}</div>
+    <div class="col-12"><button class="btn btn-primary">Guardar anexo</button></div>
+  </form>
+</div>
+{% endif %}
+<div class="card panel"><div class="table-responsive"><table class="table mb-0">
+  <thead><tr><th>Fornecedor</th><th>Documento</th><th>Descrição</th><th>Enviado por</th><th>Data</th></tr></thead>
+  <tbody>{% for attachment in attachments %}
+    <tr><td>{{ attachment.evaluation_supplier.snapshot_name }}</td><td><a href="{{ attachment.file.url }}" target="_blank" rel="noopener">{{ attachment.file.name|cut:"proposals/" }}</a></td><td>{{ attachment.description|default:"—" }}</td><td>{{ attachment.uploaded_by|default:"—" }}</td><td>{{ attachment.created_at|date:"d/m/Y H:i" }}</td></tr>
+  {% empty %}<tr><td colspan="5" class="text-center py-4 text-muted">Ainda não foram anexadas propostas.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}

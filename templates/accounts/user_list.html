@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Utilizadores{% endblock %}
+{% block page_title %}Gestão de utilizadores{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h2 class="h4 mb-0">Utilizadores</h2>
+  <a class="btn btn-primary" href="{% url 'accounts:user_create' %}"><i class="fa-solid fa-plus me-1"></i>Novo</a>
+</div>
+<div class="card panel">
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>Utilizador</th><th>Nome</th><th>Papel</th><th>Ativo</th><th></th></tr></thead>
+      <tbody>
+        {% for item in users %}
+        <tr>
+          <td>{{ item.username }}</td>
+          <td>{{ item.get_full_name }}</td>
+          <td>{{ item.get_role_display }}</td>
+          <td>{% if item.is_active %}Sim{% else %}Não{% endif %}</td>
+          <td><a href="{% url 'accounts:user_update' item.pk %}">Editar</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

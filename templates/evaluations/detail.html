@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block page_title %}Avaliação #{{ evaluation.pk }}{% endblock %}
+{% block content %}
+<div class="card panel p-4">
+  <div class="d-flex justify-content-between">
+    <div><span class="badge badge-status-{{ evaluation.status }}">{{ evaluation.get_status_display }}</span><h2 class="h5 mt-2">{{ evaluation.service.name }}</h2><p>{{ evaluation.objective }}</p></div>
+    <div>
+      <a class="btn btn-outline-primary" href="{% url 'evaluations:attachments' evaluation.pk %}">Propostas e anexos</a>
+      {% if evaluation.is_editable %}<a class="btn btn-primary" href="{% url 'evaluations:compare' evaluation.pk %}">Continuar avaliação</a>{% endif %}
+    </div>
+  </div>
+  {% if rankings %}<h3 class="h6 mt-4">Ranking preservado</h3><ol>{% for rank in rankings %}<li>{{ rank.evaluation_supplier.snapshot_name }} - {{ rank.percent|floatformat:2 }}%</li>{% endfor %}</ol>{% endif %}
+  {% if evaluation.status == 'COMPLETED' %}<a class="btn btn-outline-primary" href="{% url 'reports:preview' evaluation.pk %}">Relatório e exportações</a>{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% block title %}AHP Engenharia{% endblock %}</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- CSS da aplicação -->
+    <link href="{% static 'css/app.css' %}" rel="stylesheet">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="app-body">
+
+    <!-- Sidebar desktop -->
+    <aside class="sidebar d-lg-flex flex-column d-none">
+        {% include "includes/sidebar.html" %}
+    </aside>
+
+    <div class="main-wrap">
+
+        <!-- Topbar -->
+        <header class="topbar d-flex justify-content-between align-items-center">
+
+            <div class="d-flex align-items-center gap-2">
+
+                <!-- Menu mobile -->
+                <button
+                    class="btn btn-outline-secondary d-lg-none"
+                    type="button"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#mobileNav"
+                    aria-controls="mobileNav"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <div>
+                    <div class="text-muted small">
+                        Sistema de Apoio à Decisão
+                    </div>
+
+                    <strong>
+                        {% block page_title %}Painel{% endblock %}
+                    </strong>
+                </div>
+
+            </div>
+
+            <!-- Utilizador -->
+            <div class="d-flex align-items-center gap-3">
+
+                <span class="badge text-bg-light text-dark">
+                    {{ user.get_role_display }}
+                </span>
+
+                <a
+                    class="text-decoration-none text-dark"
+                    href="{% url 'accounts:profile' %}"
+                >
+                    <i class="fa-regular fa-user me-1"></i>
+
+                    {{ user.get_full_name|default:user.username }}
+                </a>
+
+            </div>
+
+        </header>
+
+        <!-- Conteúdo principal -->
+        <main class="content">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-3">
+
+                <ol class="breadcrumb mb-0">
+
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'dashboard:home' %}">
+                            Início
+                        </a>
+                    </li>
+
+                    {% block breadcrumb %}{% endblock %}
+
+                </ol>
+
+            </nav>
+
+            <!-- Mensagens Django -->
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div
+                        class="alert alert-{{ message.tags }} alert-dismissible fade show"
+                        role="alert"
+                    >
+                        {{ message }}
+
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Fechar"
+                        ></button>
+
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+            <!-- Conteúdo das páginas -->
+            {% block content %}{% endblock %}
+
+        </main>
+
+    </div>
+
+    <!-- Menu mobile -->
+    <div
+        class="offcanvas offcanvas-start text-bg-dark"
+        id="mobileNav"
+        tabindex="-1"
+        aria-labelledby="mobileNavLabel"
+    >
+
+        <div class="offcanvas-header">
+
+            <h5
+                class="offcanvas-title"
+                id="mobileNavLabel"
+            >
+                AHP Engenharia
+            </h5>
+
+            <button
+                type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="offcanvas"
+                aria-label="Fechar"
+            ></button>
+
+        </div>
+
+        <div class="offcanvas-body">
+            {% include "includes/sidebar.html" %}
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+    <!-- Chart.js -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"
+    ></script>
+
+    <!-- JavaScript da aplicação -->
+    <script src="{% static 'js/app.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

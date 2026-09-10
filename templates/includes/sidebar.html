@@ -1,0 +1,42 @@
+<div class="d-flex align-items-center gap-2 px-2 mb-4">
+  <div class="brand-mark">AHP</div>
+  <div>
+    <div class="fw-bold">AHP Engenharia</div>
+    <small class="text-white-50">Contratação de serviços</small>
+  </div>
+</div>
+<nav class="nav flex-column">
+  <a class="nav-link {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard:home' %}">
+    <i class="fa-solid fa-gauge-high me-2"></i>Dashboard
+  </a>
+  <a class="nav-link {% if request.resolver_match.app_name == 'evaluations' %}active{% endif %}" href="{% url 'evaluations:list' %}">
+    <i class="fa-solid fa-diagram-project me-2"></i>Avaliações
+  </a>
+  <a class="nav-link" href="{% url 'evaluations:create' %}">
+    <i class="fa-solid fa-plus me-2"></i>Nova decisão
+  </a>
+  <a class="nav-link {% if request.resolver_match.app_name == 'suppliers' %}active{% endif %}" href="{% url 'suppliers:list' %}">
+    <i class="fa-solid fa-industry me-2"></i>Fornecedores
+  </a>
+  <a class="nav-link {% if request.resolver_match.app_name == 'services' %}active{% endif %}" href="{% url 'services:list' %}">
+    <i class="fa-solid fa-screwdriver-wrench me-2"></i>Serviços
+  </a>
+  {% if user_is_admin %}
+  <a class="nav-link {% if request.resolver_match.app_name == 'criteria' %}active{% endif %}" href="{% url 'criteria:list' %}">
+    <i class="fa-solid fa-layer-group me-2"></i>Critérios
+  </a>
+  <a class="nav-link {% if request.resolver_match.app_name == 'accounts' %}active{% endif %}" href="{% url 'accounts:users' %}">
+    <i class="fa-solid fa-users-gear me-2"></i>Utilizadores
+  </a>
+  {% endif %}
+  <a class="nav-link" href="{% url 'evaluations:history' %}">
+    <i class="fa-solid fa-clock-rotate-left me-2"></i>Histórico
+  </a>
+  <a class="nav-link" href="{% url 'accounts:profile' %}">
+    <i class="fa-solid fa-id-badge me-2"></i>Perfil
+  </a>
+</nav>
+<form method="post" action="{% url 'accounts:logout' %}" class="mt-auto px-2 pt-4">
+  {% csrf_token %}
+  <button class="btn btn-outline-light w-100" type="submit"><i class="fa-solid fa-right-from-bracket me-1"></i>Sair</button>
+</form>

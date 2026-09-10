@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="row g-3 mb-4">
+
+    {% include "includes/stat_card.html" with title="Fornecedores" value=total_suppliers icon="fa-industry" %}
+
+    {% include "includes/stat_card.html" with title="Serviços" value=total_services icon="fa-screwdriver-wrench" %}
+
+    {% include "includes/stat_card.html" with title="Em andamento" value=in_progress icon="fa-spinner" %}
+
+    {% include "includes/stat_card.html" with title="Concluídas" value=completed icon="fa-circle-check" %}
+
+    {% include "includes/stat_card.html" with title="Decisões" value=decisions icon="fa-scale-balanced" %}
+
+    <div class="col-md-4 col-xl-2">
+        <div class="card stat-card h-100 p-3">
+            <div class="text-muted small">Mais recomendado</div>
+            <div class="fw-bold mt-2">{{ top_supplier }}</div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4">
+
+    <div class="col-lg-6">
+        <div class="card panel p-3">
+            <h3 class="h6">Ranking da última decisão</h3>
+            <canvas id="chartRanking"></canvas>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card panel p-3">
+            <h3 class="h6">Pesos dos critérios</h3>
+            <canvas id="chartWeights"></canvas>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card panel p-3">
+            <h3 class="h6">Avaliações por serviço</h3>
+            <canvas id="chartServices"></canvas>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card panel p-3">
+            <h3 class="h6">Avaliações por estado</h3>
+            <canvas id="chartStatus"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<div class="card panel mt-4">
+
+    <div class="card-body">
+
+        <h3 class="h6">Avaliações recentes</h3>
+
+        <div class="table-responsive">
+
+            <table class="table">
+
+                <thead>
+                    <tr>
+                        <th>Serviço</th>
+                        <th>Estado</th>
+                        <th>Data</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for item in recent %}
+
+                    <tr>
+
+                        <td>{{ item.service.name }}</td>
+
+                        <td>
+                            <span class="badge badge-status-{{ item.status }}">
+                                {{ item.get_status_display }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ item.created_at|date:"d/m/Y H:i" }}
+                        </td>
+
+                        <td>
+                            <a href="{% url 'evaluations:detail' item.pk %}">
+                                Abrir
+                            </a>
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="4">
+                            Ainda não existem avaliações.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+const ranking = {{ last_ranking|safe }};
+const weights = {{ last_weights|safe }};
+const services = {{ service_chart|safe }};
+const statuses = {{ status_chart|safe }};
+
+
+function bar(id, labels, data, label) {
+
+    new Chart(document.getElementById(id), {
+
+        type: "bar",
+
+        data: {
+            labels: labels,
+
+            datasets: [
+                {
+                    label: label,
+                    data: data,
+                    backgroundColor: "#1a6aa3"
+                }
+            ]
+        },
+
+        options: {
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+
+    });
+
+}
+
+
+bar(
+    "chartRanking",
+    ranking.map(x => x.label),
+    ranking.map(x => x.percent),
+    "%"
+);
+
+
+bar(
+    "chartWeights",
+    weights.map(x => x.label),
+    weights.map(x => +(x.weight * 100).toFixed(2)),
+    "%"
+);
+
+
+bar(
+    "chartServices",
+    services.map(x => x.service__name),
+    services.map(x => x.total),
+    "Avaliações"
+);
+
+
+new Chart(document.getElementById("chartStatus"), {
+
+    type: "doughnut",
+
+    data: {
+
+        labels: statuses.map(x => x.status),
+
+        datasets: [
+            {
+                data: statuses.map(x => x.total),
+
+                backgroundColor: [
+                    "#1a6aa3",
+                    "#1f7a4d",
+                    "#c9a227",
+                    "#b42318",
+                    "#64748b"
+                ]
+            }
+        ]
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

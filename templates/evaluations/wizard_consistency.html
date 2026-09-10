@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block page_title %}Avaliação — consistência{% endblock %}
+{% block content %}
+{% include "includes/wizard.html" %}
+<div class="card panel p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div><h2 class="h5 mb-1">Passo 5: verificação de consistência</h2><p class="text-muted mb-0">Uma matriz é aceitável quando CR &lt; {{ threshold }}.</p></div>
+    <span class="badge fs-6 text-bg-{% if evaluation.status == 'INCONSISTENT' %}danger{% else %}primary{% endif %}">{{ evaluation.get_status_display }}</span>
+  </div>
+  {% if result and not result.all_consistent %}<div class="alert alert-warning">A avaliação permanece inconsistente porque uma ou mais matrizes abaixo têm CR igual ou superior a {{ threshold }}. Reveja todas as linhas a vermelho.</div>{% endif %}
+  <div class="table-responsive">
+    <table class="table">
+      <thead><tr><th>Matriz</th><th>λmax</th><th>CI</th><th>RI</th><th>CR</th><th>Situação</th><th></th></tr></thead>
+      <tbody>
+      {% for matrix in matrices %}
+        <tr class="{% if not matrix.is_consistent %}table-danger{% endif %}">
+          <td>{{ matrix.get_matrix_type_display }}{% if matrix.parent_criterion %}: {{ matrix.parent_criterion.label }}{% endif %}</td>
+          <td>{{ matrix.lambda_max|floatformat:4 }}</td><td>{{ matrix.ci|floatformat:4 }}</td><td>{{ matrix.ri|floatformat:4 }}</td><td><b>{{ matrix.cr|floatformat:4 }}</b></td>
+          <td><span class="badge text-bg-{% if matrix.is_consistent %}success{% else %}danger{% endif %}">{% if matrix.is_consistent %}Consistente{% else %}Rever comparações{% endif %}</span></td>
+          <td>{% if matrix.matrix_type == "CRITERIA" %}<a class="btn btn-sm btn-outline-primary" href="{% url 'evaluations:compare' evaluation.pk %}?review=criteria">Rever</a>{% elif matrix.matrix_type == "SUBCRITERIA" %}<a class="btn btn-sm btn-outline-primary" href="{% url 'evaluations:compare' evaluation.pk %}?review=sub-{{ matrix.parent_criterion_id }}">Rever</a>{% else %}<a class="btn btn-sm btn-outline-primary" href="{% url 'evaluations:compare' evaluation.pk %}?review=alternatives-{{ matrix.parent_criterion_id }}">Rever</a>{% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if result %}{% for explanation in result.explanations %}<div class="alert alert-{% if result.all_consistent %}success{% else %}warning{% endif %}">{{ explanation }}</div>{% endfor %}{% endif %}
+  <a class="btn btn-outline-secondary" href="{% url 'evaluations:compare' evaluation.pk %}?review=criteria">Rever critérios</a>
+  {% if result and result.all_consistent %}<a class="btn btn-primary" href="{% url 'evaluations:results' evaluation.pk %}">Ver resultados</a>{% endif %}
+</div>
+{% endblock %}

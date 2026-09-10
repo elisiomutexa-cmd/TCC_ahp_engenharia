@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block page_title %}Avaliação — comparações pareadas{% endblock %}
+{% block content %}
+{% include "includes/wizard.html" %}
+<form method="post" {% if review %}action="?review={{ review }}"{% endif %}>
+  {% csrf_token %}
+  <div class="card panel p-4">
+    <h2 class="h5">{{ title }}</h2>
+    <p class="text-muted">Escolha o elemento preferido e a intensidade na escala de Saaty. O valor recíproco é registado automaticamente.</p>
+    {% if review %}<div class="alert alert-info">Modo de revisão: os valores guardados para esta matriz serão substituídos ao guardar.</div>{% endif %}
+    {% for left,right in pairs %}
+      <div class="compare-card p-3 mb-3">
+        <div class="row align-items-center">
+          <div class="col-md-4 text-center"><b>{{ left.label }}</b></div>
+          <div class="col-md-4 text-center"><div class="vs-badge mx-auto">vs</div></div>
+          <div class="col-md-4 text-center"><b>{{ right.label }}</b></div>
+        </div>
+        <div class="row g-2 mt-2">
+          <div class="col-md-5">
+            <select class="form-select" name="pair_{{ left.id }}_{{ right.id }}_preferred" required>
+              <option value="">Qual é preferido?</option>
+              <option value="LEFT">{{ left.label }}</option><option value="EQUAL">Igualmente importantes</option><option value="RIGHT">{{ right.label }}</option>
+            </select>
+          </div>
+          <div class="col-md-7"><select class="form-select" name="pair_{{ left.id }}_{{ right.id }}_intensity">{% for number,text in saaty.items %}<option value="{{ number }}" {% if number == 1 %}selected{% endif %}>{{ number }} — {{ text }}</option>{% endfor %}</select></div>
+        </div>
+      </div>
+    {% endfor %}
+    <button class="btn btn-primary">Guardar comparações</button>
+  </div>
+</form>
+{% endblock %}
